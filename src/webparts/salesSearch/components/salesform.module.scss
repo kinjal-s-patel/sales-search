@@ -13,7 +13,7 @@
    Header
    ===================== */
 .header {
-  background: linear-gradient(to right, #102a6d, #3a7dff); /* 🎨 Royal Blue gradient */
+  background: linear-gradient(to right, #1e4abb, #3a7dff); /* 🎨 Royal Blue gradient */
   color: white;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@
 }
 
 .searchBtn {
-  background: #102a6d;
+  background: #1f53d4;
   color: white;
   font-weight: bold;
   border: none;
@@ -115,7 +115,7 @@
 }
 
 .searchBtn:hover {
-  background: #1a4fff;
+  background: #1f53d4;
 }
 
 .clearBtn {
@@ -168,7 +168,7 @@
 }
 
 .resultsTable thead {
-  background: #1a4fff;
+  background: #1f53d4;
   color: #fff;
 }
 
@@ -238,7 +238,7 @@
 .footer {
   text-align: center;
   padding: 1rem;
-  background: #102a6d;
+  background: #1e4abb;
   color: white;
   margin-top: auto;
 }

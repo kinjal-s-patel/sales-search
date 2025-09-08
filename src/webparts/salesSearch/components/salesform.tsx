@@ -20,8 +20,8 @@ const normalizeKey = (key: string): string =>
     ? key
         .toString()
         .trim()
-        .replace(/\s+|\(|\)|-+/g, "_") // replace spaces, (), -
-        .replace(/^_+|_+$/g, "") // trim underscores
+        .replace(/\s+|\(|\)|-+/g, "_")
+        .replace(/^_+|_+$/g, "")
     : key;
 
 const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
@@ -41,26 +41,18 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
   // SP init
   const sp = React.useMemo(() => spfi().using(SPFx(context)), [context]);
 
-  // Load Excel and normalize headers once
+  // Load Excel/CSV from SharePoint
   React.useEffect(() => {
     const loadFile = async () => {
       try {
-        const filePath =
-          "/sites/salesdata/Shared Documents/apollo data.csv";
-       
+        const filePath = "/sites/salesdata/Shared Documents/apollo data.csv";
 
-        const blob = await sp.web
-          .getFileByServerRelativePath(filePath)
-          .getBlob();
-
+        const blob = await sp.web.getFileByServerRelativePath(filePath).getBlob();
         const buffer = await blob.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: "array" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json<any[]>(sheet, {
-          header: 1,
-          defval: "",
-        });
 
+        const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, defval: "" });
         if (!rows || rows.length < 2) {
           setData([]);
           setHeaders([]);
@@ -82,7 +74,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
         setData(formatted);
         console.log(`Parsed ${formatted.length} rows with ${normalizedHeaders.length} headers`);
       } catch (err) {
-        console.error("Error fetching Excel file:", err);
+        console.error("Error fetching CSV file:", err);
         setData([]);
         setHeaders([]);
       }
@@ -91,18 +83,14 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
     loadFile();
   }, [sp]);
 
-  // fields to render (use human-friendly labels but compute normalized keys)
+  // Fields to render
   const rawFormFields = [
-    "City",
-    "Functional_Area",
-    "Industry",
-    "Key_Skills",
-    "Salary",
-    "Work_Experience",
-    "Preferred_Location",
-    "Course(Highest_Education)",
-    "Specialization(Highest_Education)",
-    "Course(2nd_Highest_Education)",
+    "person_title",
+    "person_detailed_function",
+    "person_email",
+    "person_location_city",
+    "person_location_state",
+    "person_location_country",
   ];
 
   const formFields = React.useMemo(
@@ -115,60 +103,11 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
     []
   );
 
-  // safe helper to extract unique values for a given normalized key
-  const getUniqueValues = React.useCallback(
-    (key: string) => {
-      try {
-        if (!Array.isArray(data) || data.length === 0) return [];
-        const vals: string[] = [];
-        for (const row of data) {
-          try {
-            const rawVal = row?.[key];
-            if (rawVal === null || rawVal === undefined) continue;
-
-            if (typeof rawVal === "string" || typeof rawVal === "number" || typeof rawVal === "boolean") {
-              const s = String(rawVal).trim();
-              if (s) vals.push(s);
-              continue;
-            }
-
-            // if it's an array (e.g. skills stored as array)
-            if (Array.isArray(rawVal)) {
-              const joined = rawVal.map((v) => String(v).trim()).filter(Boolean).join(", ");
-              if (joined) vals.push(joined);
-              continue;
-            }
-
-            // if it's an object, try common properties or stringify
-            if (typeof rawVal === "object") {
-              const candidate = String(rawVal?.Title ?? rawVal?.Name ?? rawVal?.name ?? rawVal?.label ?? JSON.stringify(rawVal)).trim();
-              if (candidate) vals.push(candidate);
-              continue;
-            }
-          } catch (inner) {
-            // ignore badly shaped row cell
-            continue;
-          }
-        }
-
-        // unique & preserve insertion order
-        return Array.from(new Set(vals));
-      } catch (e) {
-        console.error("getUniqueValues error for key", key, e);
-        return [];
-      }
-    },
-    [data]
-  );
-
-  const cityKey = normalizeKey("City");
-  const cityOptions = React.useMemo(() => getUniqueValues(cityKey), [getUniqueValues, cityKey]);
-
-  // handle change (inputs use normalized `name`)
+  // Handle change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setQuery((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // Search using normalized keys that are stored in query
+  // Search
   const handleSearch = () => {
     setLoading(true);
     setTimeout(() => {
@@ -189,17 +128,17 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, 200);
   };
 
-  // Clear filters
+  // Clear
   const handleClear = () => {
     setQuery({});
     setResults([]);
     setCurrentPage(1);
   };
 
-  // Hide SharePoint chrome (kept as you had it)
+  /// Hide SharePoint chrome (kept as you had it)
   React.useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
@@ -217,20 +156,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
   }, []);
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        margin: 0,
-        padding: 0,
-        overflow: "auto",
-        backgroundColor: "#fff",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        zIndex: 9999,
-      }}
-    >
+    <div style={{ width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "auto", backgroundColor: "#fff", position: "fixed", top: 0, left: 0, zIndex: 9999 }}>
       <div className={styles.pageWrapper}>
         {/* Header */}
         <header className={styles.header}>
@@ -238,44 +164,25 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
             <img src={logo} alt="Logo" style={{ width: "120px", height: "auto" }} />
           </div>
           <div className={styles.titleBlock}>
-            <h1>Sales Search</h1>
-            <p>Search Sales data Easily</p>
+            <h1>Search Keywords</h1>
+            <p>Search Sales Data Easily</p>
           </div>
         </header>
 
-        {/* Form card */}
+        {/* Form */}
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>🔎 Search Keywords</h2>
-
           <div className={styles.form}>
-            {formFields.map(({ key, label }) =>
-              key === cityKey ? (
-                <div key={key} className={styles.inputGroup}>
-                  <input
-                    list="city-options"
-                    name={key}
-                    placeholder={label}
-                    className={styles.input}
-                    value={query[key] || ""}
-                    onChange={handleChange}
-                  />
-                  <datalist id="city-options">
-                    {cityOptions.map((city, i) => (
-                      <option key={i} value={city} />
-                    ))}
-                  </datalist>
-                </div>
-              ) : (
-                <input
-                  key={key}
-                  name={key}
-                  placeholder={label}
-                  className={styles.input}
-                  value={query[key] || ""}
-                  onChange={handleChange}
-                />
-              )
-            )}
+            {formFields.map(({ key, label }) => (
+              <input
+                key={key}
+                name={key}
+                placeholder={label}
+                className={styles.input}
+                value={query[key] || ""}
+                onChange={handleChange}
+              />
+            ))}
 
             <div className={styles.buttonGroup}>
               <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
@@ -298,31 +205,30 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
               <table className={styles.resultsTable}>
                 <thead>
                   <tr>
-                    {Object.keys(results[0]).map((col) => (
-                      <th key={col}>{col.replace(/_/g, " ")}</th>
+                    {formFields.map(({ key, label }) => (
+                      <th key={key}>{label}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {currentRows.map((row, idx) => (
                     <tr key={idx}>
-                      {Object.keys(row).map((col) => (
-                        <td key={col}>{Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "")}</td>
+                      {formFields.map(({ key }) => (
+                        <td key={key}>{Array.isArray(row[key]) ? row[key].join(", ") : String(row[key] ?? "")}</td>
                       ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
 
+              {/* Pagination */}
               <div className={styles.pagination}>
                 <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}>
                   ◀ Prev
                 </button>
-
                 <span>
                   Page {currentPage} of {totalPages}
                 </span>
-
                 <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}>
                   Next ▶
                 </button>
@@ -331,7 +237,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
           )}
         </div>
 
-        <footer className={styles.footer}>© 2025 Candidate Search. All rights reserved.</footer>
+        <footer className={styles.footer}>© 2025 Sales Search. All rights reserved.</footer>
       </div>
     </div>
   );
