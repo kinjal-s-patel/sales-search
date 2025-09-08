@@ -83,21 +83,20 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
     loadFile();
   }, [sp]);
 
-  // Fields to render
-  const rawFormFields = [
-    "person_title",
-    "person_detailed_function",
-    "person_email",
-    "person_location_city",
-    "person_location_state",
-    "person_location_country",
-  ];
+  // Fields to render with friendly labels
+  const rawFormFields: Record<string, string> = {
+    person_title: "Designation",
+    person_detailed_function: "Function",
+    person_email: "Email",
+    person_location_city: "City",
+    person_location_state: "State",
+    person_location_country: "Country",
+  };
 
   const formFields = React.useMemo(
     () =>
-      rawFormFields.map((raw) => {
+      Object.entries(rawFormFields).map(([raw, label]) => {
         const key = normalizeKey(raw);
-        const label = raw.replace(/_/g, " ").replace(/\(|\)/g, "");
         return { raw, key, label };
       }),
     []
@@ -116,7 +115,12 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
           Object.entries(query).every(([k, v]) => {
             if (!v || v.toString().trim() === "") return true;
             const cell = row?.[k];
-            const text = cell === null || cell === undefined ? "" : typeof cell === "object" ? JSON.stringify(cell) : String(cell);
+            const text =
+              cell === null || cell === undefined
+                ? ""
+                : typeof cell === "object"
+                ? JSON.stringify(cell)
+                : String(cell);
             return text.toLowerCase().includes(v.toLowerCase());
           })
         );
@@ -138,7 +142,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
     setCurrentPage(1);
   };
 
-  /// Hide SharePoint chrome (kept as you had it)
+  // Hide SharePoint chrome
   React.useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
@@ -156,7 +160,20 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
   }, []);
 
   return (
-    <div style={{ width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "auto", backgroundColor: "#fff", position: "fixed", top: 0, left: 0, zIndex: 9999 }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+        overflow: "auto",
+        backgroundColor: "#fff",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 9999,
+      }}
+    >
       <div className={styles.pageWrapper}>
         {/* Header */}
         <header className={styles.header}>
@@ -183,8 +200,8 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
                 onChange={handleChange}
               />
             ))}
-
-            <div className={styles.buttonGroup}>
+ 
+           <div className={styles.buttonGroup}>
               <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
                 {loading ? <span className={styles.loading}></span> : "Search"}
               </button>
@@ -214,7 +231,9 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
                   {currentRows.map((row, idx) => (
                     <tr key={idx}>
                       {formFields.map(({ key }) => (
-                        <td key={key}>{Array.isArray(row[key]) ? row[key].join(", ") : String(row[key] ?? "")}</td>
+                        <td key={key}>
+                          {Array.isArray(row[key]) ? row[key].join(", ") : String(row[key] ?? "")}
+                        </td>
                       ))}
                     </tr>
                   ))}
@@ -223,13 +242,19 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
 
               {/* Pagination */}
               <div className={styles.pagination}>
-                <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}>
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
                   ◀ Prev
                 </button>
                 <span>
                   Page {currentPage} of {totalPages}
                 </span>
-                <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
                   Next ▶
                 </button>
               </div>
