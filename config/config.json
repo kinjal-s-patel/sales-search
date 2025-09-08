@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "sales-search-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/salesSearch/SalesSearchWebPart.js",
+          "manifest": "./src/webparts/salesSearch/SalesSearchWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "SalesSearchWebPartStrings": "lib/webparts/salesSearch/loc/{locale}.js"
+  }
+}
