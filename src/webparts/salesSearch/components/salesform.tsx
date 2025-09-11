@@ -26,7 +26,6 @@ const normalizeKey = (key: string): string =>
 
 const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
   const [data, setData] = React.useState<any[]>([]);
-  const [, setHeaders] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [query, setQuery] = React.useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -55,13 +54,11 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
         const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, defval: "" });
         if (!rows || rows.length < 2) {
           setData([]);
-          setHeaders([]);
           return;
         }
 
         const rawHeaders = rows[0] as string[];
         const normalizedHeaders = rawHeaders.map((h) => normalizeKey(String(h || "")));
-        setHeaders(normalizedHeaders);
 
         const dataRows = rows.slice(1);
         const formatted = dataRows.map((r) =>
@@ -76,31 +73,47 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
       } catch (err) {
         console.error("Error fetching CSV file:", err);
         setData([]);
-        setHeaders([]);
       }
     };
 
     loadFile();
   }, [sp]);
 
-  // Fields to render with friendly labels
-  const rawFormFields: Record<string, string> = {
+  // Fields for search
+  const searchFields: Record<string, string> = {
     person_title: "Designation",
     person_detailed_function: "Function",
     person_email: "Email",
     person_location_city: "City",
     person_location_state: "State",
     person_location_country: "Country",
+    person_seniority: "Seniority",
   };
 
   const formFields = React.useMemo(
     () =>
-      Object.entries(rawFormFields).map(([raw, label]) => {
+      Object.entries(searchFields).map(([raw, label]) => {
         const key = normalizeKey(raw);
         return { raw, key, label };
       }),
     []
   );
+
+  // Fields for result display
+  const displayFields: Record<string, string> = {
+    person_name: "Full Name",
+    person_first_name_unanalyzed: "First Name",
+    person_last_name_unanalyzed: "Last Name",
+    person_title: "Designation",
+    person_functions: "Functions",
+    person_seniority: "Seniority",
+    person_email: "Email",
+    person_phone: "Phone",
+    person_linkedin_url: "LinkedIn",
+    person_location_city: "City",
+    person_location_state: "State",
+    person_location_country: "Country",
+  };
 
   // Handle change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -160,7 +173,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
   }, []);
 
   return (
-    <div
+       <div
       style={{
         width: "100vw",
         height: "100vh",
@@ -174,96 +187,96 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = ({ context }) => {
         zIndex: 9999,
       }}
     >
-      <div className={styles.pageWrapper}>
-        {/* Header */}
-        <header className={styles.header}>
-          <div className={styles.logo}>
-            <img src={logo} alt="Logo" style={{ width: "120px", height: "auto" }} />
-          </div>
-          <div className={styles.titleBlock}>
-            <h1>Search Keywords</h1>
-            <p>Search Sales Data Easily</p>
-          </div>
-        </header>
+    <div className={styles.pageWrapper}>
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.logo}>
+          <img src={logo} alt="Logo" style={{ width: "120px", height: "auto" }} />
+        </div>
+        <div className={styles.titleBlock}>
+          <h1>Search Keywords</h1>
+          <p>Search Sales Data Easily</p>
+        </div>
+      </header>
 
-        {/* Form */}
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>🔎 Search Keywords</h2>
-          <div className={styles.form}>
-            {formFields.map(({ key, label }) => (
-              <input
-                key={key}
-                name={key}
-                placeholder={label}
-                className={styles.input}
-                value={query[key] || ""}
-                onChange={handleChange}
-              />
-            ))}
- 
-           <div className={styles.buttonGroup}>
-              <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
-                {loading ? <span className={styles.loading}></span> : "Search"}
-              </button>
-              <button className={styles.clearBtn} onClick={handleClear} disabled={loading}>
-                Clear Filters
-              </button>
-            </div>
+      {/* Form */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>🔎 Search Keywords</h2>
+        <div className={styles.form}>
+          {formFields.map(({ key, label }) => (
+            <input
+              key={key}
+              name={key}
+              placeholder={label}
+              className={styles.input}
+              value={query[key] || ""}
+              onChange={handleChange}
+            />
+          ))}
+
+          <div className={styles.buttonGroup}>
+            <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
+              {loading ? <span className={styles.loading}></span> : "Search"}
+            </button>
+            <button className={styles.clearBtn} onClick={handleClear} disabled={loading}>
+              Clear Filters
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Results */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>📊 Results</h3>
-          {results.length === 0 ? (
-            <p className={styles.noResults}>No records found.</p>
-          ) : (
-            <div className={styles.tableWrapper}>
-              <table className={styles.resultsTable}>
-                <thead>
-                  <tr>
-                    {formFields.map(({ key, label }) => (
-                      <th key={key}>{label}</th>
+      {/* Results */}
+      <div className={styles.card}>
+        <h3 className={styles.cardTitle}>📊 Results</h3>
+        {results.length === 0 ? (
+          <p className={styles.noResults}>No records found.</p>
+        ) : (
+          <div className={styles.tableWrapper}>
+            <table className={styles.resultsTable}>
+              <thead>
+                <tr>
+                  {Object.entries(displayFields).map(([key, label]) => (
+                    <th key={key}>{label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {currentRows.map((row, idx) => (
+                  <tr key={idx}>
+                    {Object.keys(displayFields).map((key) => (
+                      <td key={key}>
+                        {Array.isArray(row[key]) ? row[key].join(", ") : String(row[key] ?? "")}
+                      </td>
                     ))}
                   </tr>
-                </thead>
-                <tbody>
-                  {currentRows.map((row, idx) => (
-                    <tr key={idx}>
-                      {formFields.map(({ key }) => (
-                        <td key={key}>
-                          {Array.isArray(row[key]) ? row[key].join(", ") : String(row[key] ?? "")}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                ))}
+              </tbody>
+            </table>
 
-              {/* Pagination */}
-              <div className={styles.pagination}>
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                >
-                  ◀ Prev
-                </button>
-                <span>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                >
-                  Next ▶
-                </button>
-              </div>
+            {/* Pagination */}
+            <div className={styles.pagination}>
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              >
+                ◀ Prev
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next ▶
+              </button>
             </div>
-          )}
-        </div>
-
-        <footer className={styles.footer}>© 2025 Sales Search. All rights reserved.</footer>
+          </div>
+        )}
       </div>
+
+      <footer className={styles.footer}>© 2025 Sales Search. All rights reserved.</footer>
+    </div>
     </div>
   );
 };
