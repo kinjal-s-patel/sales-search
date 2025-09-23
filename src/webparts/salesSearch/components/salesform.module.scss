@@ -219,6 +219,27 @@
   100% { transform: rotate(360deg); }
 }
 
+.spinnerWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  border: 3px solid #f3f3f3; /* light gray */
+  border-top: 3px solid #274690; /* primary color */
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
 /* =====================
    No Results Message
    ===================== */
