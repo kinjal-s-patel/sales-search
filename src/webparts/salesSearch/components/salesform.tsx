@@ -269,7 +269,6 @@
 
 // export default CsvSearchForm;
 
-
 import * as React from "react";
 import styles from "./salesform.module.scss";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
@@ -287,31 +286,33 @@ interface SearchResult {
   person_location_country: string;
   person_title: string;
   person_functions: string;
-  [key: string]: string; // Index signature for dynamic access
+  [key: string]: string; // Index signature
 }
 
-interface PaginationInfo {
-  page: number;
-  pageSize: number;
-  total: number | string;
-  totalPages: number | string;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
+// interface PaginationInfo {
+//   page: number;
+//   pageSize: number;
+//   total: number | string;
+//   totalPages: number | string;
+//   hasNextPage: boolean;
+//   hasPrevPage: boolean;
+// }
 
 const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
-  // 🔹 State variables
   const [results, setResults] = React.useState<SearchResult[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [pagination, setPagination] = React.useState<PaginationInfo | null>(null);
   const [query, setQuery] = React.useState<Record<string, string>>({});
   const [error, setError] = React.useState<string>("");
-  const [suggestions, setSuggestions] = React.useState<Record<string, string[]>>({});
-  
-  // 🔹 Search and display fields
+    // pagination
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
+  const [totalRows, setTotalRows] = React.useState<number>(0);
+  const rowsPerPage = 20;
+  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+
+  // fields
   const searchFields: Record<string, string> = {
     person_title: "Designation",
-    person_functions: "Function", 
+    person_functions: "Function",
     person_location_city: "City",
     person_location_state: "State",
     person_location_country: "Country",
@@ -322,162 +323,94 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
     person_title: "Designation",
     person_functions: "Functions",
     person_email: "Email",
+    person_phone : "Phone",
     person_location_city: "City",
     person_location_state: "State",
     person_location_country: "Country",
   };
+  
+  // fetch page from API (replaces results)
+  const fetchPage = React.useCallback(
+    async (page = 1, filters: Record<string, string> = {}) => {
+      setLoading(true);
+      setError("");
+      try {
+        const params = new URLSearchParams();
+        params.append("page", page.toString());
+        params.append("pageSize", rowsPerPage.toString());
 
-  // 🔹 Debounced suggestions fetch
-const fetchSuggestions = React.useMemo(() => {
-  const debounce = (func: (field: string, searchValue: string) => Promise<void>, wait: number) => {
-    let timeout: ReturnType<typeof setTimeout>;
-    return (field: string, searchValue: string) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(field, searchValue), wait);
-    };
-  };
+        Object.keys(filters).forEach((k) => {
+          const v = filters[k];
+          if (v && v.trim().length >= 2) params.append(k, v.trim());
+        });
 
-  return debounce(async (field: string, searchValue: string) => {
-    if (!searchValue || searchValue.length < 2) {
-      setSuggestions(prev => ({ ...prev, [field]: [] }));
-      return;
-    }
-
-    try {
-      // Call the existing /api/users endpoint with the field as query
-      const params = new URLSearchParams();
-      params.append(field, searchValue);
-
- const res = await fetch(`http://localhost:5000/api/users?${params.toString()}`);
-
-      if (res.ok) {
+        // // update base URL if needed
+        // const res = await fetch(`http://localhost:3000/api/users?${params.toString()}`);
+         const res = await fetch(`https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/users?${params.toString()}`);
+        if (!res.ok) throw new Error(`API ${res.status}`);
         const data = await res.json();
-        // Extract unique suggestions for this field
-const uniqueSuggestions = Object.keys(
-  data.data
-    .reduce((acc: Record<string, boolean>, item: Record<string, any>) => {
-      const val = item[field];
-      if (typeof val === "string" && val.trim() !== "") {
-        acc[val] = true;
-      }
-      return acc;
-    }, {})
-);
 
-        setSuggestions(prev => ({ ...prev, [field]: uniqueSuggestions.slice(0, 10) }));
-      } else {
-        console.error(`Suggestions fetch failed: ${res.status}`);
-      }
-    } catch (err) {
-      console.error("Error fetching suggestions:", err);
-    }
-  }, 300);
-}, []);
-
-
-  // 🔹 Optimized fetch function
-  const fetchPage = async (page = 1) => {
-    setLoading(true);
-    setError("");
-    
-    try {
-      const params = new URLSearchParams();
-      params.append('page', page.toString());
-      params.append('pageSize', '50');
-      
-      // Add query parameters that have valid values
-      Object.keys(query).forEach(key => {
-        const value = query[key];
-        if (value && value.trim().length >= 2) {
-          params.append(key, value.trim());
+        // assume API returns { data: [], pagination: { page, total, pageSize, totalPages } }
+        setResults(data.data || []);
+        // set total & current page from API if present, else infer
+        if (data.pagination) {
+          setCurrentPage(data.pagination.page ?? page);
+          setTotalRows(Number(data.pagination.total ?? 0));
+        } else {
+          setCurrentPage(page);
+          setTotalRows(Number(data.total ?? data.totalRows ?? 0));
         }
-      });
-
-      const res = await fetch(`http://localhost:5000/api/users?${params.toString()}`);
-      
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
+      } catch (err) {
+        console.error(err);
+        setError(err instanceof Error ? err.message : "Fetch error");
+        setResults([]);
+        setTotalRows(0);
+      } finally {
+        setLoading(false);
       }
+    },
+    []
+  );
 
-      const data = await res.json();
-      
-      setResults(data.data || []);
-      setPagination(data.pagination);
-      
-    } catch (err) {
-      console.error("Error fetching page:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch data");
-      setResults([]);
-      setPagination(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔎 Trigger search → fetch first page
+   // search triggered by button or Enter
   const handleSearch = () => {
-    const hasValidQuery = Object.keys(query).some(key => {
+    const hasValidQuery = Object.keys(query).some((key) => {
       const value = query[key];
       return value && value.trim().length >= 2;
     });
-    
+
     if (!hasValidQuery) {
       setError("Please enter at least 2 characters in any search field");
       return;
     }
-    
+
     setResults([]);
-    setPagination(null);
-    setError("");
-    fetchPage(1);
+    setCurrentPage(1);
+    setTotalRows(0);
+    fetchPage(1, query);
   };
 
-  // 🔄 Clear filters
   const handleClear = () => {
     setQuery({});
     setResults([]);
-    setPagination(null);
+    setCurrentPage(1);
+    setTotalRows(0);
     setError("");
-    setSuggestions({});
   };
 
-  // 🔄 Pagination controls
-  const handleNext = () => {
-    if (pagination?.hasNextPage) {
-      fetchPage(pagination.page + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (pagination?.hasPrevPage) {
-      fetchPage(pagination.page - 1);
-    }
-  };
-
-  // 🔹 Handle input changes with suggestions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setQuery(prev => ({ ...prev, [name]: value }));
-    
-    // Fetch suggestions for this field
-    if (value.length >= 2) {
-      fetchSuggestions(name, value);
-    } else {
-      setSuggestions(prev => ({ ...prev, [name]: [] }));
-    }
+    setQuery((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Handle suggestion selection
-  const handleSuggestionClick = (field: string, suggestion: string) => {
-    setQuery(prev => ({ ...prev, [field]: suggestion }));
-    setSuggestions(prev => ({ ...prev, [field]: [] }));
-  };
-
-  // 🔹 Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
+  };
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    fetchPage(page, query);
   };
 
   // ✅ Hide SharePoint UI
@@ -547,24 +480,13 @@ const uniqueSuggestions = Object.keys(
           </div>
         </header>
 
-        {/* Form */}
-        <div className={styles.card}>
+   <div className={styles.card}>
           <h2 className={styles.cardTitle}>🔎 Search Keywords</h2>
-          {error && (
-            <div style={{ 
-              color: '#d32f2f', 
-              background: '#ffebee', 
-              padding: '10px', 
-              borderRadius: '4px', 
-              marginBottom: '15px' 
-            }}>
-              ⚠️ {error}
-            </div>
-          )}
-          
+          {error && <div style={{ color: "#d32f2f", background: "#ffebee", padding: 10, borderRadius: 4 }}>{error}</div>}
+
           <div className={styles.form}>
             {Object.keys(searchFields).map((fieldKey) => (
-              <div key={fieldKey} style={{ position: 'relative' }}>
+              <div key={fieldKey}>
                 <input
                   name={fieldKey}
                   placeholder={searchFields[fieldKey]}
@@ -574,59 +496,15 @@ const uniqueSuggestions = Object.keys(
                   onKeyPress={handleKeyPress}
                   autoComplete="off"
                 />
-                
-                {/* Suggestions dropdown */}
-                {suggestions[fieldKey] && suggestions[fieldKey].length > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    backgroundColor: 'white',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    maxHeight: '150px',
-                    overflowY: 'auto',
-                    zIndex: 1000,
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-                  }}>
-                    {suggestions[fieldKey].slice(0, 10).map((suggestion: string, idx: number) => (
-                      <div
-                        key={idx}
-                        style={{
-                          padding: '8px 12px',
-                          cursor: 'pointer',
-                          borderBottom: '1px solid #eee'
-                        }}
-                        onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
-                          (e.target as HTMLElement).style.backgroundColor = '#f5f5f5';
-                        }}
-                        onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
-                          (e.target as HTMLElement).style.backgroundColor = 'white';
-                        }}
-                        onClick={() => handleSuggestionClick(fieldKey, suggestion)}
-                      >
-                        {suggestion}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             ))}
-            
+
+
             <div className={styles.buttonGroup}>
-              <button 
-                className={styles.searchBtn} 
-                onClick={handleSearch} 
-                disabled={loading}
-              >
+              <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
                 {loading ? "🔄 Searching..." : "🔍 Search"}
               </button>
-              <button 
-                className={styles.clearBtn} 
-                onClick={handleClear} 
-                disabled={loading}
-              >
+              <button className={styles.clearBtn} onClick={handleClear} disabled={loading}>
                 🗑️ Clear Filters
               </button>
             </div>
@@ -634,42 +512,27 @@ const uniqueSuggestions = Object.keys(
         </div>
 
         {/* Results */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            📊 Results
-            {pagination && typeof pagination.totalPages === 'number' && (
-              <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '10px' }}>
-                (Page {pagination.page} of {pagination.totalPages} • {pagination.total} total)
-              </span>
-            )}
-          </h3>
-          
-          {results.length === 0 ? (
-            <p className={styles.noResults}>
-              {loading ? "🔄 Loading..." : "No records found. Try adjusting your search criteria."}
-            </p>
+     <div className={styles.card}>
+          <h3 className={styles.cardTitle}>📊 Results</h3>
+
+          {loading ? (
+            <p className={styles.noResults}>🔄 Loading...</p>
+          ) : results.length === 0 ? (
+            <p className={styles.noResults}>{Object.keys(query).length === 0 ? "Please enter a search filter and click Search." : "No records found."}</p>
           ) : (
             <div className={styles.tableWrapper}>
               <table className={styles.resultsTable}>
                 <thead>
                   <tr>
-                    {Object.keys(displayFields).map((key) => (
-                      <th key={key}>{displayFields[key]}</th>
-                    ))}
+                    {Object.keys(displayFields).map((key) => <th key={key}>{displayFields[key]}</th>)}
                   </tr>
                 </thead>
                 <tbody>
                   {results.map((row, idx) => (
-                    <tr key={`${row.person_email}-${idx}`}>
+                    <tr key={idx} className={idx % 2 === 0 ? styles.rowEven : styles.rowOdd}>
                       {Object.keys(displayFields).map((key) => (
                         <td key={key}>
-                          {key === 'person_email' && row[key as keyof SearchResult] ? (
-                            <a href={`mailto:${row[key as keyof SearchResult]}`} style={{ color: '#1976d2' }}>
-                              {String(row[key as keyof SearchResult] || "")}
-                            </a>
-                          ) : (
-                            String(row[key as keyof SearchResult] || "")
-                          )}
+                          {key === "person_email" && row[key] ? <a href={`mailto:${row[key]}`} className={styles.emailLink}>{row[key]}</a> : (row[key] ?? "")}
                         </td>
                       ))}
                     </tr>
@@ -677,35 +540,11 @@ const uniqueSuggestions = Object.keys(
                 </tbody>
               </table>
 
-              {/* Enhanced Pagination */}
-              {pagination && (
-                <div className={styles.pagination}>
-                  <button 
-                    onClick={handlePrev} 
-                    disabled={!pagination.hasPrevPage || loading}
-                    title="Previous page"
-                  >
-                    ◀ Prev
-                  </button>
-                  
-                  <span style={{ 
-                    margin: '0 15px', 
-                    fontSize: '14px',
-                    color: '#666'
-                  }}>
-                    Page {pagination.page}
-                    {typeof pagination.totalPages === 'number' && ` of ${pagination.totalPages}`}
-                  </span>
-                  
-                  <button 
-                    onClick={handleNext} 
-                    disabled={!pagination.hasNextPage || loading}
-                    title="Next page"
-                  >
-                    Next ▶
-                  </button>
-                </div>
-              )}
+            <div className={styles.pagination}>
+                <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1 || loading}>◀ Prev</button>
+                <span>Page {currentPage} of {totalPages} • {totalRows} total</span>
+                <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages || loading}>Next ▶</button>
+              </div>
             </div>
           )}
         </div>

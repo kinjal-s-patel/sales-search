@@ -83,7 +83,9 @@
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
-/* Button Group */
+/* =====================
+   Button Group
+   ===================== */
 .buttonGroup {
   display: flex;
   gap: 10px;
@@ -124,51 +126,57 @@
    Results Table
    ===================== */
 .tableWrapper {
-  width: 100%;
-  overflow-x: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: auto;
   margin-top: 16px;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
 }
 
 .resultsTable {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
+  min-width: 800px; /* allow horizontal scroll */
   background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  font-size: 14px;
 }
 
-.resultsTable thead {
-  background: #243B55; /* navy */
+.resultsTable thead th {
+  position: sticky;
+  top: 0;
+  background: #274c90;
   color: #fff;
-}
-
-.resultsTable th,
-.resultsTable td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #e5e7eb;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 200px;
-}
-
-.resultsTable th {
   font-weight: 600;
-  font-size: 13px;
+  padding: 10px 12px;
+  text-align: left;
+  z-index: 2;
 }
 
-.resultsTable tbody tr:nth-child(even) {
-  background: #f9fafb; /* subtle striping */
+.resultsTable td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f1f1f1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.resultsTable tbody tr:hover {
-  background: #e2e8f0;
-  transition: background 0.2s ease-in-out;
+.rowEven {
+  background-color: #edeff3; /* subtle alternate shade */
+}
+
+.rowOdd {
+  background-color: #ffffff;
+}
+
+.resultsTable tr:hover td {
+  background-color: #e6f0ff;
+}
+
+.emailLink {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.emailLink:hover {
+  text-decoration: underline;
 }
 
 /* =====================
@@ -200,18 +208,27 @@
 .pagination button:hover:not(:disabled) {
   background: #2563eb;
 }
+
 /* =====================
    Loading Spinner
    ===================== */
-.loading {
+.loading,
+.spinner {
   display: inline-block;
+  border-radius: 50%;
   width: 18px;
   height: 18px;
-  border: 2px solid #cbd5e1;         /* light gray ring */
-  border-top: 2px solid #3b82f6;     /* soft blue spinner */
-  border-radius: 50%;
   animation: spin 1s linear infinite;
-  vertical-align: middle;
+}
+
+.loading {
+  border: 2px solid #cbd5e1;       /* light gray ring */
+  border-top: 2px solid #3b82f6;   /* soft blue spinner */
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;       /* light gray */
+  border-top: 3px solid #274690;   /* primary color */
 }
 
 @keyframes spin {
@@ -224,21 +241,6 @@
   align-items: center;
   gap: 8px;
 }
-
-.spinner {
-  border: 3px solid #f3f3f3; /* light gray */
-  border-top: 3px solid #274690; /* primary color */
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 
 /* =====================
    No Results Message
