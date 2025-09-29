@@ -313,6 +313,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
   const searchFields: Record<string, string> = {
     person_title: "Designation",
     person_functions: "Function",
+    person_seniority: "Seniority",
     person_location_city: "City",
     person_location_state: "State",
     person_location_country: "Country",
@@ -322,8 +323,10 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
     person_name: "Full Name",
     person_title: "Designation",
     person_functions: "Functions",
+    person_seniority: "Seniority",
     person_email: "Email",
     person_phone : "Phone",
+    person_linkedin_url : "Linkdin",
     person_location_city: "City",
     person_location_state: "State",
     person_location_country: "Country",
