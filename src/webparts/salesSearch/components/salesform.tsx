@@ -308,7 +308,11 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
   const [totalRows, setTotalRows] = React.useState<number>(0);
   const rowsPerPage = 20;
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-  
+  const [seniorityOptions, setSeniorityOptions] = React.useState<string[]>([]);
+  const [showOnlyWithEmail, setShowOnlyWithEmail] = React.useState(false);
+const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
+
+
 
   // fields
   const searchFields: Record<string, string> = {
@@ -334,6 +338,24 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
     person_location_state: "State",
     person_location_country: "Country",
   };
+
+  React.useEffect(() => {
+  const fetchSeniorityOptions = async () => {
+    try {
+      const res = await fetch(
+        "https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/suggestions?field=person_seniority"
+      );
+      if (!res.ok) throw new Error("Failed to load seniority options");
+      const data = await res.json();
+      setSeniorityOptions(data || []);
+    } catch (err) {
+      console.error("Error fetching seniority options:", err);
+    }
+  };
+
+  fetchSeniorityOptions();
+}, []);
+
   
   // fetch page from API (replaces results)
   const fetchPage = React.useCallback(
@@ -404,10 +426,12 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
     setError("");
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setQuery((prev) => ({ ...prev, [name]: value }));
-  };
+ const handleInputChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+  setQuery((prev) => ({ ...prev, [name]: value }));
+};
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSearch();
@@ -418,6 +442,12 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
     setCurrentPage(page);
     fetchPage(page, query);
   };
+
+const filteredResults = results.filter((row) => {
+  if (showOnlyWithEmail && !row.person_email) return false;   // must have email
+  if (showOnlyWithPhone && !row.person_phone) return false;   // must have phone
+  return true;
+});
 
   // ✅ Hide SharePoint UI
   React.useEffect(() => {
@@ -492,18 +522,36 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
 
           <div className={styles.form}>
             {Object.keys(searchFields).map((fieldKey) => (
-              <div key={fieldKey}>
-                <input
-                  name={fieldKey}
-                  placeholder={searchFields[fieldKey]}
-                  className={styles.input}
-                  value={query[fieldKey] || ""}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  autoComplete="off"
-                />
-              </div>
-            ))}
+  <div key={fieldKey}>
+    {fieldKey === "person_seniority" ? (
+  <select
+  name={fieldKey}
+  className={styles.input}   // ✅ same style as input
+  value={query[fieldKey] || ""}
+  onChange={handleInputChange}
+>
+  <option value="">{searchFields[fieldKey]}</option>
+  {seniorityOptions.map((opt) => (
+    <option key={opt} value={opt}>
+      {opt}
+    </option>
+  ))}
+</select>
+
+    ) : (
+      <input
+        name={fieldKey}
+        placeholder={searchFields[fieldKey]}
+        className={styles.input}
+        value={query[fieldKey] || ""}
+        onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
+        autoComplete="off"
+      />
+    )}
+  </div>
+))}
+
 
 
             <div className={styles.buttonGroup}>
@@ -519,7 +567,28 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
 
         {/* Results */}
      <div className={styles.card}>
-          <h3 className={styles.cardTitle}>📊 Results</h3>
+        <h3 className={styles.cardTitle}>
+  📊 Results
+  <div className={styles.filterCheckboxes}>
+    <label>
+      <input
+        type="checkbox"
+        checked={showOnlyWithEmail}
+        onChange={() => setShowOnlyWithEmail((prev) => !prev)}
+      />
+      Email Only
+    </label>
+    <label>
+      <input
+        type="checkbox"
+        checked={showOnlyWithPhone}
+        onChange={() => setShowOnlyWithPhone((prev) => !prev)}
+      />
+      Phone Only
+    </label>
+  </div>
+</h3>
+
 
           {loading ? (
             <p className={styles.noResults}>🔄 Loading...</p>
@@ -534,7 +603,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.map((row, idx) => (
+               {filteredResults.map((row, idx) => (
                     <tr key={idx} className={idx % 2 === 0 ? styles.rowEven : styles.rowOdd}>
                       {Object.keys(displayFields).map((key) => (
                         <td key={key}>
