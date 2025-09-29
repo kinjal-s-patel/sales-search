@@ -308,12 +308,15 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
   const [totalRows, setTotalRows] = React.useState<number>(0);
   const rowsPerPage = 20;
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+  
 
   // fields
   const searchFields: Record<string, string> = {
+    person_name: "Name",
     person_title: "Designation",
     person_functions: "Function",
     person_seniority: "Seniority",
+    person_linkdin_url : "Linkdin",
     person_location_city: "City",
     person_location_state: "State",
     person_location_country: "Country",
