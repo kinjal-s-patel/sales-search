@@ -12,32 +12,30 @@
 .header {
   background: linear-gradient(135deg, #2E86C1, #1ABC9C);
   color: white;
-display: flex;
+  display: flex;
   align-items: center;
-  justify-content: center; /* ensures whole block is centered */
+  justify-content: space-between; /* distribute logo, title, spacer */
   padding: 20px 40px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  gap: 10px;
+  position: relative;
 }
 
 /* Logo */
 .logo {
+  flex: 1;                  /* take equal space as spacer */
   display: flex;
-  align-items: center;
-  justify-content: flex-start; /* force it to the left */
+  justify-content: flex-start;
 }
 
 .logo img {
   width: 55px;
   height: auto;
-  flex-shrink: 0;
 }
 
 /* Title Block */
 .titleBlock {
-  width: 100%;              /* make it full width */
-  text-align: center;       /* center text inside */
-  margin: 0 auto;           /* ensure no side offset */
+  flex: 2;                   /* center area takes more space */
+  text-align: center;
 }
 
 .titleBlock h1 {
@@ -52,6 +50,12 @@ display: flex;
   opacity: 0.9;
 }
 
+/* Spacer (for symmetry) */
+.header::after {
+  content: "";
+  flex: 1; /* balances the logo width */
+}
+
 
 /* ===== STATS CARDS ===== */
 .statsContainer {
@@ -60,7 +64,7 @@ display: flex;
   align-items: center;
   flex-wrap: wrap;
   padding: 40px 20px;
-  gap: 30px;
+  gap: 50px;
   flex: 1;
 }
 
