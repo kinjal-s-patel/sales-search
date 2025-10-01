@@ -12,16 +12,24 @@
 
 /* =====================
    Header
-   ===================== */
+ /* ===================== */
+/* Header Layout */
 .header {
   background: linear-gradient(135deg, #2E86C1, #1ABC9C);
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* distribute logo, title, nav */
+  justify-content: space-between; /* logo left, title center, future nav right */
   padding: 20px 40px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   gap: 20px;
+}
+
+/* Logo Section */
+.headerLeft .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo img {
@@ -30,24 +38,27 @@
   flex-shrink: 0;
 }
 
-.titleBlock {
+/* Title Section */
+.headerCenter {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  flex: 1; /* let title expand in middle */
+  text-align: center; /* keep title & subtitle centered */
+  flex: 1; /* ensures title stays centered between logo and nav */
 }
 
-.titleBlock h1 {
+.title {
   margin: 0;
   font-size: 24px;
   font-weight: bold;
 }
 
-.titleBlock p {
+.subtitle {
   margin: 6px 0 0;
   font-size: 14px;
   opacity: 0.9;
 }
+
 
 /* ===== Navigation Buttons ===== */
 .navButtons {

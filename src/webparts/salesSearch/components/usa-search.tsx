@@ -1,273 +1,3 @@
-// import * as React from "react";
-// import styles from "./salesform.module.scss";
-// import { WebPartContext } from "@microsoft/sp-webpart-base";
-// import logo from "../assets/logo.png";
-
-// export interface ICsvSearchFormProps {
-//   context: WebPartContext;
-// }
-
-// const normalizeKey = (key: string): string =>
-//   key
-//     ? key.toString().trim().replace(/\s+|\(|\)|-+/g, "_").replace(/^_+|_+$/g, "")
-//     : key;
-
-// const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
-//   // 🔹 State variables
-//   const [results, setResults] = React.useState<any[]>([]);
-//   const [loading, setLoading] = React.useState(false);
-//   const [nextPage, setNextPage] = React.useState<number | null>(null);
-//   const [prevPages, setPrevPages] = React.useState<number[]>([]);
-//   const [query, setQuery] = React.useState<Record<string, string>>({});
-
-//   // 🔹 Search and display fields
-//   const searchFields: Record<string, string> = {
-//     person_title: "Designation",
-//     person_functions: "Function",
-//     person_location_city: "City",
-//     person_location_state: "State",
-//     person_location_country: "Country",
-//     person_seniority: "Seniority",
-//   };
-
-//   const formFields = React.useMemo(
-//     () =>
-//       Object.keys(searchFields).map((raw) => ({
-//         raw,
-//         key: normalizeKey(raw),
-//         label: searchFields[raw],
-//       })),
-//     []
-//   );
-
-//   const displayFields: Record<string, string> = {
-//     person_name: "Full Name",
-//     person_first_name_unanalyzed: "First Name",
-//     person_last_name_unanalyzed: "Last Name",
-//     person_title: "Designation",
-//     person_functions: "Functions",
-//     person_seniority: "Seniority",
-//     person_email: "Email",
-//     person_phone: "Phone",
-//     person_linkedin_url: "LinkedIn",
-//     person_location_city: "City",
-//     person_location_state: "State",
-//     person_location_country: "Country",
-//   };
-// // 🔹 Fetch a page from /api/users
-// // 🔹 Fetch a page from /api/users
-// const fetchPage = async (page = 1) => {
-//   setLoading(true);
-//   try {
-//     const params = new URLSearchParams({
-//       page: page.toString(),
-//       pageSize: "50", // match backend limit
-//       person_title: query.person_title || "",
-//       person_functions: query.person_functions || "",
-//       person_location_city: query.person_location_city || "",
-//       person_location_state: query.person_location_state || "",
-//       person_location_country: query.person_location_country || "",
-//     });
-
-//     // Call your Express backend API
-//     const res = await fetch(`http://localhost:3000/api/users?${params.toString()}`);
-//     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-
-//     const data = await res.json();
-
-//     setResults(data.data || []);
-
-//     const totalPages = Math.ceil(data.total / data.pageSize);
-//     setNextPage(page < totalPages ? page + 1 : null);
-
-//   if (page > 1) {
-//   setPrevPages((prev) => {
-//     const lastPage = prev[prev.length - 1];
-//     if (lastPage !== page - 1) {
-//       return [...prev, page - 1];
-//     }
-//     return prev;
-//   });
-// }
-
-//   } catch (err) {
-//     console.error("Error fetching page:", err);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
-
-// // 🔎 Trigger search → fetch first page
-// const handleSearch = () => {
-//   setResults([]);
-//   setPrevPages([]);
-//   setNextPage(null);
-//   fetchPage(1);
-// };
-
-// // 🔄 Clear filters
-// const handleClear = () => {
-//   setQuery({});
-//   setResults([]);
-//   setPrevPages([]);
-//   setNextPage(null);
-// };
-
-// // 🔄 Pagination controls
-// const handleNext = () => {
-//   if (nextPage) fetchPage(nextPage);
-// };
-
-// const handlePrev = () => {
-//   if (prevPages.length === 0) return;
-
-//   const newPrev = [...prevPages];
-//   const lastPage = newPrev.pop(); // previous page number
-//   if (lastPage) fetchPage(lastPage);
-
-//   setPrevPages(newPrev);
-// };
-
-
-//   // ✅ Hide SharePoint UI
-//   React.useEffect(() => {
-//     const style = document.createElement("style");
-//     style.innerHTML = `
-//       #SuiteNavWrapper,
-//       #spSiteHeader,
-//       #spLeftNav,
-//       .spAppBar,
-//       .sp-appBar,
-//       .sp-appBar-mobile,
-//       div[data-automation-id="pageCommandBar"],
-//       div[data-automation-id="pageHeader"],
-//       div[data-automation-id="pageFooter"] {
-//         display: none !important;
-//         height: 0 !important;
-//         overflow: hidden !important;
-//       }
-//       html, body {
-//         margin: 0 !important;
-//         padding: 0 !important;
-//         height: 100% !important;
-//         width: 100% !important;
-//         overflow: hidden !important;
-//         background: #fff !important;
-//       }
-//       #spPageCanvasContent, .CanvasComponent, .CanvasZone, .CanvasSection, .control-zone {
-//         width: 100vw !important;
-//         height: 100vh !important;
-//         margin: 0 !important;
-//         padding: 0 !important;
-//         overflow: hidden !important;
-//         max-width: 100vw !important;
-//       }
-//       .ms-FocusZone {
-//         overflow: hidden !important;
-//       }
-//     `;
-//     document.head.appendChild(style);
-//   }, []);
-
-//   return (
-//     <div
-//       style={{
-//         width: "100vw",
-//         height: "100vh",
-//         margin: 0,
-//         padding: 0,
-//         overflow: "auto",
-//         backgroundColor: "#fff",
-//         position: "fixed",
-//         top: 0,
-//         left: 0,
-//         zIndex: 9999,
-//       }}
-//     >
-//       <div className={styles.pageWrapper}>
-//         {/* Header */}
-//         <header className={styles.header}>
-//           <div className={styles.logo}>
-//             <img src={logo} alt="Logo" style={{ width: 120, height: "auto" }} />
-//           </div>
-//           <div className={styles.titleBlock}>
-//             <h1>Search Keywords</h1>
-//             <p>Search Sales Data Easily</p>
-//           </div>
-//         </header>
-
-//         {/* Form */}
-//         <div className={styles.card}>
-//           <h2 className={styles.cardTitle}>🔎 Search Keywords</h2>
-//           <div className={styles.form}>
-//             {formFields.map(({ key, label }) => (
-//               <input
-//                 key={key}
-//                 name={key}
-//                 placeholder={label}
-//                 className={styles.input}
-//                 value={query[key] || ""}
-//                 onChange={(e) =>
-//                   setQuery((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-//                 }
-//               />
-//             ))}
-//             <div className={styles.buttonGroup}>
-//               <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
-//                 {loading ? "Searching..." : "Search"}
-//               </button>
-//               <button className={styles.clearBtn} onClick={handleClear} disabled={loading}>
-//                 Clear Filters
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Results */}
-//         <div className={styles.card}>
-//           <h3 className={styles.cardTitle}>📊 Results</h3>
-//           {results.length === 0 ? (
-//             <p className={styles.noResults}>No records found.</p>
-//           ) : (
-//             <div className={styles.tableWrapper}>
-//               <table className={styles.resultsTable}>
-//                 <thead>
-//                   <tr>
-//                     {Object.keys(displayFields).map((key) => (
-//                       <th key={key}>{displayFields[key]}</th>
-//                     ))}
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {results.map((row, idx) => (
-//                     <tr key={idx}>
-//                       {Object.keys(displayFields).map((key) => (
-//                         <td key={key}>{String(row[key] || "")}</td>
-//                       ))}
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-
-//               {/* Pagination */}
-//               <div className={styles.pagination}>
-//                 <button onClick={handlePrev} disabled={prevPages.length === 0}>
-//                   ◀ Prev
-//                 </button>
-//                 <button onClick={handleNext} disabled={!nextPage}>
-//                   Next ▶
-//                 </button>
-//               </div>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CsvSearchForm;
 
 import * as React from "react";
 import styles from "./salesform.module.scss";
@@ -299,7 +29,7 @@ interface SearchResult {
 //   hasPrevPage: boolean;
 // }
 
-const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
+const UsaSearch : React.FC<ICsvSearchFormProps> = (props) => {
   const [results, setResults] = React.useState<SearchResult[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [query, setQuery] = React.useState<Record<string, string>>({});
@@ -313,10 +43,7 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
   const [showOnlyWithEmail, setShowOnlyWithEmail] = React.useState(false);
 const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
 
-
     const navigate = useNavigate();
-
-
 
   // fields
   const searchFields: Record<string, string> = {
@@ -327,7 +54,7 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
     // person_linkdin_url : "Linkedin",
     person_location_city: "City",
     person_location_state: "State",
-
+ 
   };
 
   const displayFields: Record<string, string> = {
@@ -510,7 +237,7 @@ const filteredResults = results.filter((row) => {
     >
       <div className={styles.pageWrapper}>
         {/* Header */}
-<header className={styles.header}>
+      <header className={styles.header}>
   {/* Logo */}
   <div className={styles.logo}>
     <img src={logo} alt="Logo" style={{ width: 120, height: "auto" }} />
@@ -525,14 +252,14 @@ const filteredResults = results.filter((row) => {
   {/* Navigation Buttons */}
   <nav className={styles.navButtons}>
     <button onClick={() => navigate("/")} className={styles.navBtn}>Dashboard</button>
-    <button onClick={() => navigate("/usa-search")} className={styles.navBtn}>USA Data</button>
+    <button onClick={() => navigate("/salesform")} className={styles.navBtn}>India Data</button>
     <button onClick={() => navigate("/globalsearch")} className={styles.navBtn}>Global Data</button>
   </nav>
 </header>
 
 
    <div className={styles.card}>
-          <h2 className={styles.cardTitle}>🔎 Search Keywords for India </h2>
+          <h2 className={styles.cardTitle}>🔎 Search Keywords for USA </h2>
           {error && <div style={{ color: "#d32f2f", background: "#ffebee", padding: 10, borderRadius: 4 }}>{error}</div>}
 
           <div className={styles.form}>
@@ -647,4 +374,4 @@ const filteredResults = results.filter((row) => {
   );
 };
 
-export default CsvSearchForm;
+export default UsaSearch ;
