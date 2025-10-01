@@ -104,8 +104,8 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
         });
 
         // // update base URL if needed
-        const res = await fetch(`http://localhost:3000/api/usa-users?${params.toString()}`);
-        //  const res = await fetch(`https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/users?${params.toString()}`);
+        // const res = await fetch(`http://localhost:3000/api/usa-users?${params.toString()}`);
+         const res = await fetch(`https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/usa-users?${params.toString()}`);
         if (!res.ok) throw new Error(`API ${res.status}`);
         const data = await res.json();
 
