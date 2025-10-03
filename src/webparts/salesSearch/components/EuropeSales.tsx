@@ -29,7 +29,7 @@ interface SearchResult {
 //   hasPrevPage: boolean;
 // }
 
-const UsaSearch : React.FC<ICsvSearchFormProps> = (props) => {
+const EuropeSearch : React.FC<ICsvSearchFormProps> = (props) => {
   const [results, setResults] = React.useState<SearchResult[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [query, setQuery] = React.useState<Record<string, string>>({});
@@ -253,13 +253,13 @@ const filteredResults = results.filter((row) => {
   <nav className={styles.navButtons}>
     <button onClick={() => navigate("/")} className={styles.navBtn}>Dashboard</button>
     <button onClick={() => navigate("/salesform")} className={styles.navBtn}>India Data</button>
-    <button onClick={() => navigate("/EuropeSales")} className={styles.navBtn}>Europe Data</button>
+    <button onClick={() => navigate("/usa-search")} className={styles.navBtn}>USA Data</button>
   </nav>
 </header>
 
 
    <div className={styles.card}>
-          <h2 className={styles.cardTitle}>🔎 Search Keywords for USA </h2>
+          <h2 className={styles.cardTitle}>🔎 Search Keywords for Europe </h2>
           {error && <div style={{ color: "#d32f2f", background: "#ffebee", padding: 10, borderRadius: 4 }}>{error}</div>}
 
           <div className={styles.form}>
@@ -374,4 +374,4 @@ const filteredResults = results.filter((row) => {
   );
 };
 
-export default UsaSearch ;
+export default EuropeSearch ;

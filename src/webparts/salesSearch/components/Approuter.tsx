@@ -5,6 +5,7 @@ import { ISalesSearchProps } from './ISalesSearchProps';
 import Dashboard from './dashboard';
 import CsvSearchForm from './salesform';
 import UsaSearch  from './usa-search';
+import EuropeSearch  from './EuropeSales';
 
 const AppRouter: React.FC<ISalesSearchProps> = (props) => {
   // const navigate = useNavigate();
@@ -15,6 +16,7 @@ const AppRouter: React.FC<ISalesSearchProps> = (props) => {
       <Route path="/" element={<Dashboard {...props} />} />
       <Route path="/salesform" element={<CsvSearchForm {...props} />} />
             <Route path="/usa-search" element={<UsaSearch  {...props} />} />
+            <Route path="/EuropeSales" element={<EuropeSearch  {...props} />} />
     </Routes>
   );
 };

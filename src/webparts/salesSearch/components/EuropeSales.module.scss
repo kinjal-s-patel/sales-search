@@ -1,0 +1,418 @@
+/* =====================
+   Layout Wrapper
+   ===================== */
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9f9f9; /* match dashboard background */
+  font-family: "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+/* =====================
+   Header
+ /* ===================== */
+/* Header Layout */
+.header {
+  background: linear-gradient(135deg, #2E86C1, #1ABC9C);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo left, title center, future nav right */
+  padding: 20px 40px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  gap: 20px;
+}
+
+/* Logo Section */
+.headerLeft .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 55px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* Title Section */
+.headerCenter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center; /* keep title & subtitle centered */
+  flex: 1; /* ensures title stays centered between logo and nav */
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+
+/* ===== Navigation Buttons ===== */
+.navButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.navBtn {
+  background: #ffffff;
+  color: #2E86C1;
+  font-weight: 600;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.navBtn:hover {
+  background: #2E86C1;
+  color: #fff;
+}
+
+/* =====================
+   Card
+   ===================== */
+.card {
+  background: white;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  width: 95%;
+  max-width: 1200px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #2E86C1; /* dashboard blue */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* =====================
+   Form
+   ===================== */
+.form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2E86C1;
+  box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.3);
+}
+
+/* Styled select like input */
+select.input {
+  appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+/* =====================
+   Filter Checkboxes
+   ===================== */
+.filterCheckboxes {
+  display: inline-flex;
+  gap: 12px;
+  margin-left: auto;
+  font-size: 14px;
+  align-items: center;
+}
+
+.filterCheckboxes label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.filterCheckboxes input[type="checkbox"] {
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+}
+
+/* =====================
+   Button Group
+   ===================== */
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  grid-column: 1 / -1;
+}
+
+.searchBtn {
+  background: #2E86C1;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.searchBtn:hover {
+  background: #1f5f8b;
+}
+
+.clearBtn {
+  background: #e2e8f0;
+  color: #1e293b;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.clearBtn:hover {
+  background: #cbd5e1;
+}
+
+/* =====================
+   Results Table
+   ===================== */
+.tableWrapper {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: auto;
+  margin-top: 16px;
+}
+
+.resultsTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+  background: #fff;
+}
+
+.resultsTable thead th {
+  position: sticky;
+  top: 0;
+  background: #2E86C1;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  z-index: 2;
+}
+
+.resultsTable td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f1f1f1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowEven {
+  background-color: #f3f8fc;
+}
+
+.rowOdd {
+  background-color: #ffffff;
+}
+
+.resultsTable tr:hover td {
+  background-color: #e6f0ff;
+}
+
+
+/* =====================
+   No Results / Loading
+   ===================== */
+.noResults {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+/* =====================
+   Table Wrapper (Already included in your last CSS, extend with scroll)
+   ===================== */
+.tableWrapper {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow-x: auto; /* ✅ horizontal scroll if many columns */
+  overflow-y: auto;
+  max-height: 60vh; /* ✅ keep results scrollable */
+  margin-top: 16px;
+  background: #fff;
+}
+
+/* =====================
+   Results Table
+   ===================== */
+.resultsTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+  background: #fff;
+}
+
+.resultsTable thead th {
+  position: sticky;
+  top: 0;
+  background: #2E86C1;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+  z-index: 2;
+  font-size: 14px;
+}
+
+.resultsTable td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ✅ Row striping */
+.rowEven {
+  background-color: #f9fcff;
+}
+
+.rowOdd {
+  background-color: #ffffff;
+}
+
+.resultsTable tr:hover td {
+  background-color: #e6f0ff;
+}
+
+/* =====================
+   Email Link Styling
+   ===================== */
+.emailLink {
+  color: #2E86C1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.emailLink:hover {
+  text-decoration: underline;
+  color: #1f5f8b;
+}
+
+/* =====================
+   Pagination
+   ===================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  margin-top: 10px;
+}
+
+.pagination button {
+  background: #2E86C1;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.pagination button:hover {
+  background: #1f5f8b;
+}
+
+.pagination button:disabled {
+  background: #cbd5e1;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.pagination .activePage {
+  background: #1ABC9C; /* secondary accent */
+  font-weight: bold;
+}
+
+/* =====================
+   Footer
+   ===================== */
+.footer {
+  background: #2E86C1;
+  color: white;
+  padding: 14px;
+  text-align: center;
+  font-size: 14px;
+  margin-top: auto;
+  box-shadow: 0 -3px 6px rgba(0,0,0,0.1);
+}
+
+/* =====================
+   Responsive Design
+   ===================== */
+@media (max-width: 1024px) {
+  .form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .titleBlock {
+    align-items: center;
+  }
+  .form {
+    grid-template-columns: 1fr;
+  }
+}

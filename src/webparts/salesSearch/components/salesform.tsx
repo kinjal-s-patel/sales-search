@@ -518,15 +518,15 @@ const filteredResults = results.filter((row) => {
 
   {/* Title */}
   <div className={styles.titleBlock}>
-    <h1>JMS Sales Data Dashboard</h1>
-    <p>Quickly search sales data by region — India, USA, or Global.</p>
+    <h1>JMS Sales Data </h1>
+    <p>Quickly search sales data by region — India, USA, or Europe.</p>
   </div>
 
   {/* Navigation Buttons */}
   <nav className={styles.navButtons}>
     <button onClick={() => navigate("/")} className={styles.navBtn}>Dashboard</button>
     <button onClick={() => navigate("/usa-search")} className={styles.navBtn}>USA Data</button>
-    <button onClick={() => navigate("/globalsearch")} className={styles.navBtn}>Global Data</button>
+    <button onClick={() => navigate("/EuropeSales")} className={styles.navBtn}>Europe Data</button>
   </nav>
 </header>
 

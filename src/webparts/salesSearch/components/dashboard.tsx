@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlag, faGlobe, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import { faFlag, faBuilding, faGlobeEurope  } from '@fortawesome/free-solid-svg-icons';
 import logo from '../assets/logo.png';
 import styles from './dashboard.module.scss';
 import { useNavigate } from 'react-router-dom';
@@ -85,8 +85,8 @@ const navigateTo = (path: string) => {
 
   {/* Title Block */}
   <div className={styles.titleBlock}>
-    <h1>JMS Sales Data Dashboard</h1>
-    <p>Quickly search sales data by region — India, USA, or Global.</p>
+    <h1>JMS Sales Data </h1>
+    <p>Quickly search sales data by region — India, USA, or Europe.</p>
   </div>
 </header>
 
@@ -110,9 +110,9 @@ const navigateTo = (path: string) => {
 
 <div className={styles.cardWrapper}>
   <StatCard
-    title="Global Data"
-    icon={faGlobe}
-    onClick={() => navigateTo("/globalsales")}
+    title="Europe Data"
+    icon={faGlobeEurope}
+    onClick={() => navigateTo("/EuropeSales")}
   />
 </div>
 
