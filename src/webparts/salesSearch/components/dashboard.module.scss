@@ -50,6 +50,47 @@
   opacity: 0.9;
 }
 
+// .header {
+//   background: linear-gradient(135deg, #2E86C1, #1ABC9C);
+//   color: white;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between; /* distribute logo, title, nav */
+//   padding: 20px 40px;
+//   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+//   gap: 20px;
+// }
+
+// .logo img {
+//   width: 55px;
+//   height: auto;
+//   flex-shrink: 0;
+// }
+
+// /* =====================
+//    Title Block
+//    ===================== */
+// .titleBlock {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   flex: 1; /* title expands in middle */
+// }
+
+// .titleBlock h1 {
+//   margin: 0;
+//   font-size: 24px;
+//   font-weight: bold;
+// }
+
+// .titleBlock p {
+//   margin: 6px 0 0;
+//   font-size: 14px;
+//   opacity: 0.9;
+// }
+
+
+
 /* Spacer (for symmetry) */
 .header::after {
   content: "";

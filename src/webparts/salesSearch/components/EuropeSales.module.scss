@@ -5,31 +5,23 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #f9f9f9; /* match dashboard background */
+  background: #f9f9f9;
   font-family: "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
 }
 
 /* =====================
    Header
- /* ===================== */
-/* Header Layout */
+   ===================== */
 .header {
   background: linear-gradient(135deg, #2E86C1, #1ABC9C);
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* logo left, title center, future nav right */
+  justify-content: space-between; /* distribute logo, title, nav */
   padding: 20px 40px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   gap: 20px;
-}
-
-/* Logo Section */
-.headerLeft .logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .logo img {
@@ -38,29 +30,31 @@
   flex-shrink: 0;
 }
 
-/* Title Section */
-.headerCenter {
+/* =====================
+   Title Block
+   ===================== */
+.titleBlock {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: center; /* keep title & subtitle centered */
-  flex: 1; /* ensures title stays centered between logo and nav */
+  flex: 1; /* title expands in middle */
 }
 
-.title {
+.titleBlock h1 {
   margin: 0;
   font-size: 24px;
   font-weight: bold;
 }
 
-.subtitle {
+.titleBlock p {
   margin: 6px 0 0;
   font-size: 14px;
   opacity: 0.9;
 }
 
-
-/* ===== Navigation Buttons ===== */
+/* =====================
+   Navigation Buttons
+   ===================== */
 .navButtons {
   display: flex;
   gap: 12px;
@@ -99,7 +93,7 @@
   font-size: 20px;
   margin-bottom: 16px;
   font-weight: 600;
-  color: #2E86C1; /* dashboard blue */
+  color: #2E86C1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -132,7 +126,6 @@
   box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.3);
 }
 
-/* Styled select like input */
 select.input {
   appearance: none;
   background-color: #fff;
@@ -213,81 +206,13 @@ select.input {
 .tableWrapper {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  overflow: auto;
-  margin-top: 16px;
-}
-
-.resultsTable {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 800px;
-  background: #fff;
-}
-
-.resultsTable thead th {
-  position: sticky;
-  top: 0;
-  background: #2E86C1;
-  color: #fff;
-  font-weight: 600;
-  padding: 10px 12px;
-  text-align: left;
-  z-index: 2;
-}
-
-.resultsTable td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #f1f1f1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.rowEven {
-  background-color: #f3f8fc;
-}
-
-.rowOdd {
-  background-color: #ffffff;
-}
-
-.resultsTable tr:hover td {
-  background-color: #e6f0ff;
-}
-
-
-/* =====================
-   No Results / Loading
-   ===================== */
-.noResults {
-  text-align: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #555;
-  padding: 30px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  margin: 20px auto;
-  max-width: 600px;
-}
-
-/* =====================
-   Table Wrapper (Already included in your last CSS, extend with scroll)
-   ===================== */
-.tableWrapper {
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  overflow-x: auto; /* ✅ horizontal scroll if many columns */
+  overflow-x: auto;
   overflow-y: auto;
-  max-height: 60vh; /* ✅ keep results scrollable */
+  max-height: 60vh;
   margin-top: 16px;
   background: #fff;
 }
 
-/* =====================
-   Results Table
-   ===================== */
 .resultsTable {
   width: 100%;
   border-collapse: collapse;
@@ -317,7 +242,6 @@ select.input {
   text-overflow: ellipsis;
 }
 
-/* ✅ Row striping */
 .rowEven {
   background-color: #f9fcff;
 }
@@ -328,6 +252,22 @@ select.input {
 
 .resultsTable tr:hover td {
   background-color: #e6f0ff;
+}
+
+/* =====================
+   No Results / Loading
+   ===================== */
+.noResults {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  margin: 20px auto;
+  max-width: 600px;
 }
 
 /* =====================
@@ -378,7 +318,7 @@ select.input {
 }
 
 .pagination .activePage {
-  background: #1ABC9C; /* secondary accent */
+  background: #1ABC9C;
   font-weight: bold;
 }
 

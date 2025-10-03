@@ -29,7 +29,7 @@ interface SearchResult {
 //   hasPrevPage: boolean;
 // }
 
-const EuropeSearch : React.FC<ICsvSearchFormProps> = (props) => {
+const EuropeSearch: React.FC<ICsvSearchFormProps> = (props) => {
   const [results, setResults] = React.useState<SearchResult[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [query, setQuery] = React.useState<Record<string, string>>({});
@@ -45,6 +45,7 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
 
     const navigate = useNavigate();
 
+
   // fields
   const searchFields: Record<string, string> = {
     person_name: "Name",
@@ -54,7 +55,8 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
     // person_linkdin_url : "Linkedin",
     person_location_city: "City",
     person_location_state: "State",
- 
+    person_location_country: "Country",
+
   };
 
   const displayFields: Record<string, string> = {
@@ -104,8 +106,8 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
         });
 
         // // update base URL if needed
-        // const res = await fetch(`http://localhost:3000/api/usa-users?${params.toString()}`);
-         const res = await fetch(`https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/usa-users?${params.toString()}`);
+        // const res = await fetch(`http://localhost:3000/api/europe-users?${params.toString()}`);
+         const res = await fetch(`https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/europe-users?${params.toString()}`);
         if (!res.ok) throw new Error(`API ${res.status}`);
         const data = await res.json();
 
@@ -237,7 +239,7 @@ const filteredResults = results.filter((row) => {
     >
       <div className={styles.pageWrapper}>
         {/* Header */}
-      <header className={styles.header}>
+<header className={styles.header}>
   {/* Logo */}
   <div className={styles.logo}>
     <img src={logo} alt="Logo" style={{ width: 120, height: "auto" }} />
@@ -252,8 +254,8 @@ const filteredResults = results.filter((row) => {
   {/* Navigation Buttons */}
   <nav className={styles.navButtons}>
     <button onClick={() => navigate("/")} className={styles.navBtn}>Dashboard</button>
-    <button onClick={() => navigate("/salesform")} className={styles.navBtn}>India Data</button>
     <button onClick={() => navigate("/usa-search")} className={styles.navBtn}>USA Data</button>
+    <button onClick={() => navigate("/salesform")} className={styles.navBtn}>India Data</button>
   </nav>
 </header>
 
@@ -374,4 +376,4 @@ const filteredResults = results.filter((row) => {
   );
 };
 
-export default EuropeSearch ;
+export default EuropeSearch;
