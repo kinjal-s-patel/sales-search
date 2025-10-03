@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import styles from "./salesform.module.scss";
+import styles from "./EuropeSales.module.scss";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
