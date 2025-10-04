@@ -155,62 +155,61 @@
   font-size: 14px;
   box-shadow: 0 -3px 6px rgba(0,0,0,0.1);
 }
-
-/* ===== RESPONSIVE MEDIA QUERIES ===== */
+/* ==========================
+   RESPONSIVE MEDIA QUERIES
+   ========================== */
 @media (max-width: 1024px) {
-  .title {
-    font-size: 24px;
-  }
-  .subtitle {
-    font-size: 14px;
-  }
-  .statCard {
-    width: 200px;
-    height: 150px;
-  }
-}
-
-@media (max-width: 768px) {
-  .headerContent {
-    flex-direction: column;
-    text-align: center;
-  }
-  .headerLeft {
-    justify-content: center;
-  }
-  .headerCenter {
-    align-items: center;
-  }
-  .title {
-    font-size: 22px;
-  }
-  .subtitle {
-    font-size: 14px;
-  }
-  .statsContainer {
-    gap: 20px;
-    padding: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .logo {
-    width: 45px;
-  }
-  .title {
+  .titleBlock h1 {
     font-size: 20px;
   }
-  .subtitle {
-    font-size: 13px;
+  .titleBlock p {
+    font-size: 12px;
   }
   .statCard {
-    width: 160px;
-    height: 130px;
+    width: 180px;
+    min-height: 140px;
   }
   .statIcon {
     font-size: 32px;
   }
   .statTitle {
-    font-size: 16px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15px;
+  }
+  .navButtons {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+  .statCard {
+    width: 45%;
+    min-height: 130px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statCard {
+    width: 100%;
+    min-height: 120px;
+  }
+  .statIcon {
+    font-size: 28px;
+  }
+  .statTitle {
+    font-size: 14px;
+  }
+  .titleBlock h1 {
+    font-size: 18px;
+  }
+  .titleBlock p {
+    font-size: 11px;
   }
 }

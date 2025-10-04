@@ -312,11 +312,8 @@ const CsvSearchForm: React.FC<ICsvSearchFormProps> = (props) => {
   const [seniorityOptions, setSeniorityOptions] = React.useState<string[]>([]);
   const [showOnlyWithEmail, setShowOnlyWithEmail] = React.useState(false);
 const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
-
-
+const [abortController, setAbortController] = React.useState<AbortController | null>(null);
     const navigate = useNavigate();
-
-
 
   // fields
   const searchFields: Record<string, string> = {
@@ -346,9 +343,9 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
   React.useEffect(() => {
   const fetchSeniorityOptions = async () => {
     try {
-      const res = await fetch(
-        "https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/suggestions?field=person_seniority"
-      );
+const res = await fetch(
+  "https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/india-suggestions?field=person_seniority"
+);
       if (!res.ok) throw new Error("Failed to load seniority options");
       const data = await res.json();
       setSeniorityOptions(data || []);
@@ -360,49 +357,65 @@ const [showOnlyWithPhone, setShowOnlyWithPhone] = React.useState(false);
   fetchSeniorityOptions();
 }, []);
 
-  
-  // fetch page from API (replaces results)
-  const fetchPage = React.useCallback(
-    async (page = 1, filters: Record<string, string> = {}) => {
-      setLoading(true);
-      setError("");
-      try {
-        const params = new URLSearchParams();
-        params.append("page", page.toString());
-        params.append("pageSize", rowsPerPage.toString());
+const fetchPage = React.useCallback(
+  async (page = 1, filters: Record<string, string> = {}) => {
+    setLoading(true);
+    setError("");
 
-        Object.keys(filters).forEach((k) => {
-          const v = filters[k];
-          if (v && v.trim().length >= 2) params.append(k, v.trim());
-        });
+    // Abort previous fetch if exists
+    if (abortController) {
+      abortController.abort();
+    }
 
-        // // update base URL if needed
-        // const res = await fetch(`http://localhost:3000/api/users?${params.toString()}`);
-         const res = await fetch(`https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/users?${params.toString()}`);
-        if (!res.ok) throw new Error(`API ${res.status}`);
-        const data = await res.json();
+    // Create a new controller for this request
+    const controller = new AbortController();
+    setAbortController(controller);
 
-        // assume API returns { data: [], pagination: { page, total, pageSize, totalPages } }
-        setResults(data.data || []);
-        // set total & current page from API if present, else infer
-        if (data.pagination) {
-          setCurrentPage(data.pagination.page ?? page);
-          setTotalRows(Number(data.pagination.total ?? 0));
-        } else {
-          setCurrentPage(page);
-          setTotalRows(Number(data.total ?? data.totalRows ?? 0));
-        }
-      } catch (err) {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("pageSize", rowsPerPage.toString());
+
+      Object.keys(filters).forEach((k) => {
+        const v = filters[k];
+        if (v && v.trim().length >= 2) params.append(k, v.trim());
+      });
+
+              // const res = await fetch(`http://localhost:3000/api/users?${params.toString()}`);
+      const res = await fetch(
+        `https://apollodata-evckd5hbf3evdgg7.southindia-01.azurewebsites.net/api/users?${params.toString()}`,
+        { signal: controller.signal } // ✅ Attach the abort signal here
+      );
+
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      const data = await res.json();
+
+      setResults(data.data || []);
+      if (data.pagination) {
+        setCurrentPage(data.pagination.page ?? page);
+        setTotalRows(Number(data.pagination.total ?? 0));
+      } else {
+        setCurrentPage(page);
+        setTotalRows(Number(data.total ?? data.totalRows ?? 0));
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        console.log("Fetch aborted by user");
+        setError("Search stopped.");
+      } else {
         console.error(err);
         setError(err instanceof Error ? err.message : "Fetch error");
         setResults([]);
         setTotalRows(0);
-      } finally {
-        setLoading(false);
       }
-    },
-    []
-  );
+    } finally {
+      setLoading(false);
+      setAbortController(null);
+    }
+  },
+  [abortController]
+);
+
 
    // search triggered by button or Enter
   const handleSearch = () => {
@@ -569,17 +582,26 @@ const filteredResults = results.filter((row) => {
 
 
 
-            <div className={styles.buttonGroup}>
-              <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
-                {loading ? "🔄 Searching..." : "🔍 Search"}
-              </button>
-              <button className={styles.clearBtn} onClick={handleClear} disabled={loading}>
-                🗑️ Clear Filters
-              </button>
-            </div>
-          </div>
-        </div>
-
+<div className={styles.buttonGroup}>
+  <button className={styles.searchBtn} onClick={handleSearch} disabled={loading}>
+    {loading ? "🔄 Searching..." : "🔍 Search"}
+  </button>
+  <button className={styles.clearBtn} onClick={handleClear} disabled={loading}>
+    🗑️ Clear Filters
+  </button>
+  {loading && (
+    <button
+      className={styles.stopBtn}
+      onClick={() => {
+        if (abortController) abortController.abort();
+      }}
+    >
+      ⏹ Stop Searching
+    </button>
+  )}
+</div>
+</div>
+</div>
         {/* Results */}
      <div className={styles.card}>
         <h3 className={styles.cardTitle}>
